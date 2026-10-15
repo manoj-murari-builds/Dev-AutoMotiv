@@ -38,7 +38,11 @@ const portfolioItems = [
 ];
 
 function navigate(path) {
-  window.location.hash = path === "home" ? "/" : `/${path}`;
+  const nextPath = path === "home" ? "/" : `/${path}`;
+  if (window.location.pathname !== nextPath) {
+    window.history.pushState({}, "", nextPath);
+    window.dispatchEvent(new PopStateEvent("popstate"));
+  }
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -109,10 +113,11 @@ function PricingCards({ onBook }) {
 
 function Home({ onBook }) {
   return <main>
-    <section className="hero" id="home"><div className="hero-image" style={{ backgroundImage: `url(${images.hero})` }} /><div className="hero-shade" /><div className="hero-grid" /><div className="hero-content"><div className="hero-kicker"><span className="pulse-dot" /> Automotive content, made personal</div><h1>Know the car.<br /><span>Feel the moment.</span></h1><p className="hero-lede">PDI peace of mind. Cinematic delivery films. Automotive stories in Telugu — from someone who speaks your language.</p><div className="hero-actions"><Button className="button-red" onClick={() => onBook("PDI")}>Book a PDI <ArrowUpRight size={17} /></Button><button className="text-link light" onClick={() => navigate("portfolio")}>See the work <span>↓</span></button></div></div><div className="hero-stamp"><span>HYD</span><i>•</i><span>VJA</span><i>•</i><span>VIZAG</span><small>Service locations</small></div><div className="hero-scroll">Scroll to explore <span>↓</span></div></section>
+    <section className="hero" id="home"><div className="hero-image" style={{ backgroundImage: `url(${images.hero})` }} /><div className="hero-shade" /><div className="hero-grid" /><div className="hero-content"><div className="hero-kicker"><span className="pulse-dot" /> Automotive content, made personal</div><h1>Know the car.<br /><span>Feel the moment.</span></h1><p className="hero-lede">PDI peace of mind. Cinematic delivery films. Automotive stories in Telugu — from someone who speaks your language.</p><div className="hero-actions"><Button className="button-red" onClick={() => onBook("PDI")}>Book a PDI <ArrowUpRight size={17} /></Button><button className="text-link light" onClick={() => navigate("portfolio")}>See the work <span>↓</span></button></div><p className="hero-proof">Trusted automotive inspections and stories across Hyderabad, Vijayawada and Vizag.</p></div><div className="hero-stamp"><span>HYD</span><i>•</i><span>VJA</span><i>•</i><span>VIZAG</span><small>Service locations</small></div><div className="hero-scroll">Scroll to explore <span>↓</span></div></section>
     <section className="ticker"><div>PRE-DELIVERY INSPECTION <b>✦</b> DELIVERY FILMS <b>✦</b> AUTOMOTIVE STORIES <b>✦</b> HYDERABAD · VIJAYAWADA · VIZAG <b>✦</b></div></section>
     <section className="intro section-pad" id="services"><div className="section-label"><span>01</span><span>What I do</span></div><div className="intro-copy"><h2>The car you choose<br />deserves a <em>closer look.</em></h2><p>Protect the feeling of buying a car with a considered inspection, then capture the handover as a memory worth keeping.</p></div><div className="service-grid"><article className="service-card" style={{ backgroundImage: `url(${images.pdi})` }}><div className="service-number">01 / 02</div><div className="service-content"><span className="eyebrow">For new car buyers</span><h3>Pre-delivery<br /><em>inspection.</em></h3><p>A careful look before you sign, so you can take delivery with clarity.</p><Button className="button-red" onClick={() => onBook("PDI")}>Book a PDI <ArrowUpRight size={16} /></Button></div></article><article className="service-card" style={{ backgroundImage: `url(${images.delivery})` }}><div className="service-number">02 / 02</div><div className="service-content"><span className="eyebrow">For the big handover</span><h3>Delivery day,<br /><em>your way.</em></h3><p>Photography, reels and edits that make the moment feel like yours.</p><Button className="button-red" onClick={() => onBook("Delivery shoot")}>Book a shoot <ArrowUpRight size={16} /></Button></div></article></div></section>
-    <section className="work-section section-pad"><div className="section-label"><span>02</span><span>Selected work</span></div><div className="work-heading"><h2>Cars, captured<br /><em>with feeling.</em></h2><button className="text-link" onClick={() => navigate("portfolio")}>View portfolio <ArrowUpRight size={15} /></button></div><div className="portfolio-grid">{portfolioItems.slice(0, 3).map((item) => <a className="portfolio-item" key={item.title} href={item.href} target="_blank" rel="noreferrer" style={{ backgroundImage: `url(${item.image})` }}><div className="portfolio-overlay"><span>{item.title}</span><ArrowUpRight size={18} /></div></a>)}</div></section>
+    <section className="trust-strip" aria-label="Mr. Gearhead experience and results"><div><strong>2.5+</strong><span>Years of experience</span></div><div><strong>1,000+</strong><span>Cars inspected</span></div><div><strong>1,000+</strong><span>Happy customers</span></div></section>
+    <section className="work-section section-pad"><div className="section-label"><span>02</span><span>Selected work</span></div><div className="work-heading"><h2>Cars, captured<br /><em>with feeling.</em></h2><div className="work-links"><a href={instagramUrl} target="_blank" rel="noreferrer"><Instagram size={17} /> Instagram <ArrowUpRight size={14} /></a><a href={youtubeUrl} target="_blank" rel="noreferrer"><Youtube size={17} /> YouTube <ArrowUpRight size={14} /></a></div></div><div className="portfolio-grid">{portfolioItems.slice(0, 3).map((item, index) => <a className={`portfolio-item ${index === 0 ? "tall" : index === 1 ? "wide" : "square"}`} key={item.title} href={item.href} target="_blank" rel="noreferrer" style={{ backgroundImage: `url(${item.image})` }}><div className="portfolio-overlay"><span>{item.title}</span>{item.type === "YouTube" ? <span className="play-icon"><Play size={13} fill="currentColor" /></span> : <ArrowUpRight size={18} />}</div></a>)}</div></section>
     <section className="paper-section section-pad"><div className="section-label"><span>03</span><span>Draft pricing</span></div><div className="work-heading"><h2>Clear starting points.<br /><em>No guesswork.</em></h2><button className="text-link" onClick={() => navigate("pricing")}>View all pricing <ArrowUpRight size={15} /></button></div><PricingCards onBook={onBook} /></section>
     <section className="location-band"><div><span className="eyebrow">Currently serving</span><h2>Hyderabad · Vijayawada · Vizag</h2></div><Button className="button-red" onClick={() => onBook("PDI")}>Start an enquiry <ArrowUpRight size={17} /></Button></section>
   </main>;
@@ -144,10 +149,11 @@ function CtaStrip({ title, onBook }) {
 }
 
 function App() {
-  const [path, setPath] = useState(window.location.hash.replace("#/", "") || "home");
+  const currentPath = () => window.location.pathname.replace(/^\/|\/$/g, "") || "home";
+  const [path, setPath] = useState(currentPath);
   const [menuOpen, setMenuOpen] = useState(false);
   const [bookingService, setBookingService] = useState(null);
-  useEffect(() => { const onHash = () => setPath(window.location.hash.replace("#/", "") || "home"); window.addEventListener("hashchange", onHash); return () => window.removeEventListener("hashchange", onHash); }, []);
+  useEffect(() => { const onPopState = () => setPath(currentPath()); window.addEventListener("popstate", onPopState); return () => window.removeEventListener("popstate", onPopState); }, []);
   useEffect(() => { document.title = `${pages[path]?.title || "Mr. Gearhead in Telugu"} — Mr. Gearhead in Telugu`; window.scrollTo(0, 0); }, [path]);
   const onBook = (service = "PDI") => { setBookingService(service); navigate("contact"); setMenuOpen(false); };
   const nav = [["home", "Home"], ["pdi", "PDI Services"], ["content", "Delivery & Reels"], ["portfolio", "Portfolio"], ["pricing", "Pricing"], ["contact", "Contact"]];
