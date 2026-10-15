@@ -1,101 +1,158 @@
 import { useEffect, useState } from "react";
-import { ArrowUpRight, Check, Instagram, Menu, Play, X, Youtube } from "lucide-react";
+import {
+  ArrowUpRight, Camera, Check, ChevronDown, ClipboardCheck, Copy, Film,
+  Instagram, MapPin, Menu, MessageCircle, Play, Send, X, Youtube,
+} from "lucide-react";
 import "./styles/App.css";
+import { contact, images, instagramUrl, locations, pricing, youtubeUrl } from "./config";
 
-const instagramUrl = "https://www.instagram.com/mr.gearheadintelugu/";
-const youtubeUrl = "https://www.youtube.com/@Mr.Gearheadintelugu";
-
-const images = {
-  hero: "https://images.unsplash.com/photo-1661050629760-9c927d20ea79?auto=format&fit=crop&w=1800&q=85",
-  pdi: "https://images.unsplash.com/photo-1643701079732-3b1c7a797e3d?auto=format&fit=crop&w=1200&q=85",
-  delivery: "https://images.unsplash.com/photo-1587893143231-ebba3bedb2ea?auto=format&fit=crop&w=1200&q=85",
-  camera: "https://images.unsplash.com/photo-1595340298390-8113ab27284a?auto=format&fit=crop&w=1200&q=85",
+const pages = {
+  home: { title: "Home" },
+  pdi: { title: "PDI Services" },
+  content: { title: "Delivery Shoots & Reels" },
+  portfolio: { title: "Portfolio" },
+  pricing: { title: "Pricing" },
+  contact: { title: "Contact & Booking" },
 };
 
-function BookingModal({ onClose }) {
-  const [selected, setSelected] = useState("PDI enquiry");
-  const options = ["PDI enquiry", "Delivery shoot", "Reels & editing", "Brand collaboration"];
+const pdiAreas = [
+  ["01", "Exterior condition", "Body panels, alignment, door hinges, bumpers, hood and boot alignment."],
+  ["02", "Paint and finish", "Scratches, visible repairs and paint-thickness testing where available."],
+  ["03", "Tyres and wheels", "Manufacturing dates, tread depth, wheel condition and spare tyre."],
+  ["04", "Interior", "Upholstery, dashboard, seatbelts, trim and general cabin condition."],
+  ["05", "Electrical systems", "Lights, indicators, power windows, wipers, horn and accessible controls."],
+  ["06", "Air conditioning", "Climate controls and air-conditioning operation."],
+  ["07", "Engine bay", "Visible fluids, battery and accessible components."],
+  ["08", "Brakes and steering", "Brakes, steering and visible suspension components."],
+  ["09", "Underbody", "Underbody and exhaust condition where safely accessible."],
+  ["10", "Diagnostics", "OBD-II diagnostics if supported by the actual service booked."],
+  ["11", "Vehicle identity", "VIN, manufacturing information and available vehicle documents."],
+  ["12", "Delivery items", "Accessories, spare keys, toolkit, manuals and delivery kit."],
+];
+
+const portfolioItems = [
+  { title: "Delivery day stories", image: images.delivery, href: instagramUrl, type: "Instagram" },
+  { title: "Reviews · news · tips", image: images.camera, href: youtubeUrl, type: "YouTube" },
+  { title: "Reels and edits", image: images.hero, href: instagramUrl, type: "Instagram" },
+  { title: "The inspection detail", image: images.pdi, href: instagramUrl, type: "Instagram" },
+];
+
+function navigate(path) {
+  window.location.hash = path === "home" ? "/" : `/${path}`;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function Button({ children, onClick, className = "", href, ...props }) {
+  if (href) return <a className={`button ${className}`} href={href} {...props}>{children}</a>;
+  return <button className={`button ${className}`} onClick={onClick} {...props}>{children}</button>;
+}
+
+function PageIntro({ eyebrow, title, copy, image }) {
   return (
-    <div className="modal-backdrop" role="presentation" onClick={onClose}>
-      <div className="booking-modal" role="dialog" aria-modal="true" aria-labelledby="booking-title" onClick={(e) => e.stopPropagation()} data-testid="booking-modal">
-        <button className="icon-button modal-close" onClick={onClose} aria-label="Close booking enquiry" data-testid="booking-modal-close"><X size={20} /></button>
-        <span className="eyebrow">Start a conversation</span>
-        <h2 id="booking-title">Tell me what<br /><em>you’re driving.</em></h2>
-        <p className="modal-copy">Choose what you’re looking for. I’ll take you to Instagram DM to discuss the details.</p>
-        <div className="option-list" data-testid="booking-service-options">
-          {options.map((option) => <button key={option} className={`option ${selected === option ? "selected" : ""}`} onClick={() => setSelected(option)} data-testid={`booking-option-${option.toLowerCase().replaceAll(" ", "-")}`}><span>{option}</span>{selected === option && <Check size={16} />}</button>)}
-        </div>
-        <a className="button button-red modal-cta" href={instagramUrl} target="_blank" rel="noreferrer" data-testid="booking-instagram-link">Continue to Instagram <ArrowUpRight size={17} /></a>
-        <p className="micro-note">Bookings & collaborations are handled through Instagram DM.</p>
-      </div>
+    <section className="page-intro">
+      <div className="page-intro-copy"><span className="eyebrow">{eyebrow}</span><h1>{title}</h1><p>{copy}</p></div>
+      <div className="page-intro-image" style={{ backgroundImage: `url(${image})` }} />
+    </section>
+  );
+}
+
+function BookingForm({ initialService = "PDI", compact = false }) {
+  const [form, setForm] = useState({ name: "", phone: "", service: initialService, city: "Hyderabad", car: "", date: "", requirements: "" });
+  const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState("");
+  const [copied, setCopied] = useState(false);
+  useEffect(() => setForm((current) => ({ ...current, service: initialService })), [initialService]);
+
+  const update = (event) => setForm({ ...form, [event.target.name]: event.target.value });
+  const submit = (event) => {
+    event.preventDefault();
+    const nextErrors = {};
+    ["name", "phone", "service", "city", "car", "date"].forEach((field) => {
+      if (!form[field].trim()) nextErrors[field] = "Please provide this detail.";
+    });
+    if (form.phone && !/^[0-9+\s()-]{8,}$/.test(form.phone)) nextErrors.phone = "Enter a valid phone number.";
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length) return;
+    setMessage(`Hi Mr. Gearhead, I’m ${form.name}. I’d like to enquire about a ${form.service} for my ${form.car} in ${form.city} on ${form.date}. Please let me know availability, the final package price and next steps.${form.requirements ? ` Additional requirements: ${form.requirements}` : ""} My phone number is ${form.phone}.`);
+    setCopied(false);
+  };
+  const copyMessage = async () => {
+    try {
+      await navigator.clipboard.writeText(message);
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
+  };
+  const field = (name, label, type = "text", placeholder = "") => (
+    <label className="form-field"><span>{label}</span><input name={name} type={type} value={form[name]} onChange={update} placeholder={placeholder} />{errors[name] && <small>{errors[name]}</small>}</label>
+  );
+
+  return (
+    <div className={`booking-panel ${compact ? "compact" : ""}`}>
+      <div className="booking-heading"><span className="eyebrow">Booking enquiry</span><h2>Let’s plan your<br /><em>car moment.</em></h2><p>Share a few details and get a ready-to-send enquiry. Final availability and pricing are confirmed directly.</p></div>
+      <form className="booking-form" onSubmit={submit} noValidate>
+        <div className="form-grid">{field("name", "Name *", "text", "Your name")}{field("phone", "Phone number *", "tel", "+91")}</div>
+        <div className="form-grid"><label className="form-field"><span>Requested service *</span><select name="service" value={form.service} onChange={update}><option>PDI</option><option>Delivery shoot</option><option>Reels/editing</option><option>Combo</option></select>{errors.service && <small>{errors.service}</small>}</label><label className="form-field"><span>City *</span><select name="city" value={form.city} onChange={update}>{locations.map((location) => <option key={location}>{location}</option>)}<option>Other</option></select>{errors.city && <small>{errors.city}</small>}</label></div>
+        <div className="form-grid">{field("car", "Car make and model *", "text", "e.g. Hyundai Creta")}{field("date", "Preferred date *", "date")}</div>
+        <label className="form-field"><span>Additional requirements</span><textarea name="requirements" value={form.requirements} onChange={update} placeholder="Anything useful to know?" rows="4" /></label>
+        <Button className="button-red" type="submit">Generate WhatsApp enquiry <Send size={16} /></Button>
+      </form>
+      {message && <div className="message-preview"><span className="eyebrow">Demo mode · contact not configured</span><p>{message}</p><div className="preview-actions"><Button className="button-outline" onClick={copyMessage}><Copy size={15} /> {copied ? "Copied" : "Copy message"}</Button><span>Once a real number is added, this can open WhatsApp directly.</span></div></div>}
     </div>
   );
 }
 
+function PricingCards({ onBook }) {
+  return <div className="pricing-grid">{Object.values(pricing).map((item) => <article className="pricing-card" key={item.service}><span className="eyebrow">{item.label}</span><strong>{item.price}</strong><p>Draft demonstration pricing, pending confirmation by the creator.</p><Button className={item.service === "Combo" ? "button-red" : "button-outline"} onClick={() => onBook(item.service)}>{item.service === "PDI" ? "Book a PDI" : item.service === "Combo" ? "Enquire about combo" : "Enquire about shoot"} <ArrowUpRight size={16} /></Button></article>)}</div>;
+}
+
+function Home({ onBook }) {
+  return <main>
+    <section className="hero" id="home"><div className="hero-image" style={{ backgroundImage: `url(${images.hero})` }} /><div className="hero-shade" /><div className="hero-grid" /><div className="hero-content"><div className="hero-kicker"><span className="pulse-dot" /> Automotive content, made personal</div><h1>Know the car.<br /><span>Feel the moment.</span></h1><p className="hero-lede">PDI peace of mind. Cinematic delivery films. Automotive stories in Telugu — from someone who speaks your language.</p><div className="hero-actions"><Button className="button-red" onClick={() => onBook("PDI")}>Book a PDI <ArrowUpRight size={17} /></Button><button className="text-link light" onClick={() => navigate("portfolio")}>See the work <span>↓</span></button></div></div><div className="hero-stamp"><span>HYD</span><i>•</i><span>VJA</span><i>•</i><span>VIZAG</span><small>Service locations</small></div><div className="hero-scroll">Scroll to explore <span>↓</span></div></section>
+    <section className="ticker"><div>PRE-DELIVERY INSPECTION <b>✦</b> DELIVERY FILMS <b>✦</b> AUTOMOTIVE STORIES <b>✦</b> HYDERABAD · VIJAYAWADA · VIZAG <b>✦</b></div></section>
+    <section className="intro section-pad" id="services"><div className="section-label"><span>01</span><span>What I do</span></div><div className="intro-copy"><h2>The car you choose<br />deserves a <em>closer look.</em></h2><p>Protect the feeling of buying a car with a considered inspection, then capture the handover as a memory worth keeping.</p></div><div className="service-grid"><article className="service-card" style={{ backgroundImage: `url(${images.pdi})` }}><div className="service-number">01 / 02</div><div className="service-content"><span className="eyebrow">For new car buyers</span><h3>Pre-delivery<br /><em>inspection.</em></h3><p>A careful look before you sign, so you can take delivery with clarity.</p><Button className="button-red" onClick={() => onBook("PDI")}>Book a PDI <ArrowUpRight size={16} /></Button></div></article><article className="service-card" style={{ backgroundImage: `url(${images.delivery})` }}><div className="service-number">02 / 02</div><div className="service-content"><span className="eyebrow">For the big handover</span><h3>Delivery day,<br /><em>your way.</em></h3><p>Photography, reels and edits that make the moment feel like yours.</p><Button className="button-red" onClick={() => onBook("Delivery shoot")}>Book a shoot <ArrowUpRight size={16} /></Button></div></article></div></section>
+    <section className="work-section section-pad"><div className="section-label"><span>02</span><span>Selected work</span></div><div className="work-heading"><h2>Cars, captured<br /><em>with feeling.</em></h2><button className="text-link" onClick={() => navigate("portfolio")}>View portfolio <ArrowUpRight size={15} /></button></div><div className="portfolio-grid">{portfolioItems.slice(0, 3).map((item) => <a className="portfolio-item" key={item.title} href={item.href} target="_blank" rel="noreferrer" style={{ backgroundImage: `url(${item.image})` }}><div className="portfolio-overlay"><span>{item.title}</span><ArrowUpRight size={18} /></div></a>)}</div></section>
+    <section className="paper-section section-pad"><div className="section-label"><span>03</span><span>Draft pricing</span></div><div className="work-heading"><h2>Clear starting points.<br /><em>No guesswork.</em></h2><button className="text-link" onClick={() => navigate("pricing")}>View all pricing <ArrowUpRight size={15} /></button></div><PricingCards onBook={onBook} /></section>
+    <section className="location-band"><div><span className="eyebrow">Currently serving</span><h2>Hyderabad · Vijayawada · Vizag</h2></div><Button className="button-red" onClick={() => onBook("PDI")}>Start an enquiry <ArrowUpRight size={17} /></Button></section>
+  </main>;
+}
+
+function PdiPage({ onBook }) {
+  return <main><PageIntro eyebrow="01 / PDI services" title={<>Inspect before<br /><em>you accept.</em></>} copy="A practical pre-delivery inspection for new car buyers in Hyderabad, Vijayawada and Vizag. The exact scope depends on the service booked." image={images.pdi} /><section className="paper-section section-pad"><div className="section-label"><span>Scope</span><span>Inspection categories</span></div><div className="scope-grid">{pdiAreas.map(([number, title, copy]) => <article className="scope-card" key={number}><span>{number}</span><h3>{title}</h3><p>{copy}</p></article>)}</div><p className="disclaimer">Inspection categories are examples of what may be reviewed. Availability depends on the vehicle, access, time and service booked. No item is guaranteed for every package.</p></section><section className="dark-copy section-pad"><div className="split-copy"><div><span className="eyebrow">Why it matters</span><h2>Before the keys<br /><em>change hands.</em></h2></div><div><p>A new vehicle can still need a careful look before acceptance. Completing a PDI gives you a chance to discuss visible concerns with the dealer while the delivery process is still underway.</p><p>It is a practical second set of eyes — not a promise that every issue can be found or that a vehicle is mechanically certified.</p><Button className="button-red" onClick={() => onBook("PDI")}>Book a PDI <ArrowUpRight size={17} /></Button></div></div></section><section className="paper-section section-pad"><div className="split-copy"><div><span className="eyebrow">Simple process</span><h2>Plan. Inspect.<br /><em>Take delivery.</em></h2></div><div className="steps"><p><b>01</b> Tell us your city, car and preferred date.</p><p><b>02</b> Confirm availability and the final package price.</p><p><b>03</b> Complete the agreed inspection before accepting delivery.</p></div></div><div className="faq-list"><details><summary>When should I book a PDI? <ChevronDown size={17} /></summary><p>Before your delivery appointment, with enough notice to confirm availability.</p></details><details><summary>Is every inspection area included? <ChevronDown size={17} /></summary><p>No. The exact scope depends on the service booked, the vehicle and what is safely accessible.</p></details><details><summary>Where is the service available? <ChevronDown size={17} /></summary><p>Hyderabad, Vijayawada and Vizag are the current service locations.</p></details></div></section><CtaStrip title="Want clarity before delivery?" onBook={() => onBook("PDI")} /></main>;
+}
+
+function ContentPage({ onBook }) {
+  const services = [["New-car delivery photography", "Thoughtful stills from the handover, made for a memory you can revisit.", Camera], ["Cinematic delivery videos", "A moving record of the day, shaped around your car and your people.", Film], ["Reels and short-form videos", "Short, social-ready edits for delivery moments and automotive stories.", Play], ["Video editing and collaborations", "Editing support and automotive content conversations for brands and creators.", MessageCircle]];
+  return <main><PageIntro eyebrow="02 / Content services" title={<>Make the handover<br /><em>feel like yours.</em></>} copy="Photography, video, reels and editing for delivery days, automotive stories and brand collaborations." image={images.delivery} /><section className="dark-copy section-pad"><div className="section-label"><span>Services</span><span>Delivery day, your way</span></div><div className="content-service-grid">{services.map(([title, copy, Icon]) => <article key={title}><Icon size={24} /><h3>{title}</h3><p>{copy}</p><button className="text-link" onClick={() => onBook("Delivery shoot")}>Enquire about this <ArrowUpRight size={15} /></button></article>)}</div></section><section className="paper-section section-pad"><div className="section-label"><span>Approach</span><span>Made for your moment</span></div><div className="intro-copy"><h2>Useful, personal,<br /><em>never generic.</em></h2><p>Share the moment you want to remember, the platform you want to publish on and the kind of story you want to tell. We will confirm the practical details together.</p></div><div className="portfolio-grid">{portfolioItems.slice(0, 3).map((item) => <a className="portfolio-item" key={item.title} href={item.href} target="_blank" rel="noreferrer" style={{ backgroundImage: `url(${item.image})` }}><div className="portfolio-overlay"><span>{item.title}</span><ArrowUpRight size={18} /></div></a>)}</div></section><CtaStrip title="Have a delivery day coming up?" onBook={() => onBook("Delivery shoot")} /></main>;
+}
+
+function PortfolioPage() {
+  return <main><PageIntro eyebrow="03 / Portfolio" title={<>Stories from<br /><em>the road.</em></>} copy="Explore the latest automotive stories, delivery moments, reviews, news and tips on the creator’s real social channels." image={images.camera} /><section className="work-section section-pad"><div className="section-label"><span>Selected work</span><span>Follow the real channels</span></div><div className="portfolio-grid portfolio-large">{portfolioItems.map((item) => <a className="portfolio-item" key={item.title} href={item.href} target="_blank" rel="noreferrer" style={{ backgroundImage: `url(${item.image})` }}><div className="portfolio-overlay"><span>{item.title}<small>{item.type}</small></span><ArrowUpRight size={18} /></div></a>)}</div><div className="social-links"><a className="button button-outline" href={instagramUrl} target="_blank" rel="noreferrer"><Instagram size={16} /> Follow on Instagram</a><a className="button button-outline" href={youtubeUrl} target="_blank" rel="noreferrer"><Youtube size={16} /> Watch on YouTube</a></div></section></main>;
+}
+
+function PricingPage({ onBook }) {
+  return <main><PageIntro eyebrow="04 / Pricing" title={<>Start with the<br /><em>right fit.</em></>} copy="Draft demonstration pricing is shown below. Final scope, availability and price are confirmed by the creator before booking." image={images.hero} /><section className="paper-section section-pad"><div className="section-label"><span>Draft rates</span><span>Pending creator confirmation</span></div><PricingCards onBook={onBook} /><p className="disclaimer">Prices shown are proposed starting points for this demonstration. There are no implied discounts, savings or fixed inclusions.</p></section><CtaStrip title="Not sure which option fits?" onBook={() => onBook("PDI")} /></main>;
+}
+
+function ContactPage({ initialService }) {
+  return <main><PageIntro eyebrow="05 / Contact & booking" title={<>Tell me what<br /><em>you’re driving.</em></>} copy="Use the enquiry form for availability, final pricing and next steps. WhatsApp contact is in demo mode until the creator provides a real number." image={images.camera} /><section className="paper-section section-pad contact-layout"><BookingForm initialService={initialService} /><aside className="contact-aside"><span className="eyebrow">Other ways to connect</span><h2>Keep the<br /><em>conversation easy.</em></h2><p>Prefer a direct message? Instagram is open for bookings and collaborations.</p><a className="text-link" href={instagramUrl} target="_blank" rel="noreferrer"><Instagram size={16} /> Message on Instagram <ArrowUpRight size={15} /></a><div className="contact-detail"><MapPin size={18} /><div><b>Service locations</b><span>Hyderabad<br />Vijayawada<br />Vizag</span></div></div><div className="contact-detail"><MessageCircle size={18} /><div><b>WhatsApp</b><span>{contact.displayPhone}<br />Demo contact — not configured</span></div></div></aside></section></main>;
+}
+
+function CtaStrip({ title, onBook }) {
+  return <section className="final-cta"><div><span className="eyebrow">Ready when you are</span><h2>{title}</h2></div><Button className="button-red" onClick={onBook}>Start an enquiry <ArrowUpRight size={17} /></Button></section>;
+}
+
 function App() {
+  const [path, setPath] = useState(window.location.hash.replace("#/", "") || "home");
   const [menuOpen, setMenuOpen] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
-
-  useEffect(() => {
-    document.title = "Mr. Gearhead in Telugu — PDI & Car Delivery Films";
-    const description = "PDI services, car delivery shoots, reels and automotive content by Mr. Gearhead in Telugu — Hyderabad, Vijayawada and Vizag.";
-    let meta = document.querySelector('meta[name="description"]');
-    if (!meta) { meta = document.createElement("meta"); meta.name = "description"; document.head.appendChild(meta); }
-    meta.content = description;
-  }, []);
-
-  const scrollTo = (id) => { document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }); setMenuOpen(false); };
-
-  return (
-    <div className="site-shell">
-      <header className="topbar" data-testid="site-header">
-        <button className="wordmark" onClick={() => scrollTo("home")} data-testid="brand-home-link"><span className="mark">MG</span><span>MR. GEARHEAD<br /><b>IN TELUGU</b></span></button>
-        <nav className={`main-nav ${menuOpen ? "open" : ""}`} data-testid="main-navigation">
-          <button onClick={() => scrollTo("services")} data-testid="nav-services-link">Services</button>
-          <button onClick={() => scrollTo("work")} data-testid="nav-work-link">Work</button>
-          <button onClick={() => scrollTo("about")} data-testid="nav-about-link">About</button>
-          <button className="nav-cta" onClick={() => setModalOpen(true)} data-testid="nav-booking-button">Book an enquiry <ArrowUpRight size={15} /></button>
-        </nav>
-        <button className="mobile-menu" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle navigation" data-testid="mobile-menu-button">{menuOpen ? <X /> : <Menu />}</button>
-      </header>
-
-      <main>
-        <section className="hero" id="home" data-testid="hero-section">
-          <div className="hero-image" style={{ backgroundImage: `url(${images.hero})` }} />
-          <div className="hero-shade" />
-          <div className="hero-grid" />
-          <div className="hero-content">
-            <div className="hero-kicker"><span className="pulse-dot" /> Automotive content, made personal</div>
-            <h1>Know the car.<br /><span>Feel the moment.</span></h1>
-            <p className="hero-lede">PDI peace of mind. Cinematic delivery films. Automotive stories in Telugu — from someone who speaks your language.</p>
-            <div className="hero-actions"><button className="button button-red" onClick={() => setModalOpen(true)} data-testid="hero-pdi-button">Book a PDI enquiry <ArrowUpRight size={17} /></button><button className="text-link light" onClick={() => scrollTo("work")} data-testid="hero-work-link">See the work <span>↓</span></button></div>
-          </div>
-          <div className="hero-stamp" data-testid="hero-location-stamp"><span>HYD</span><i>•</i><span>VJA</span><i>•</i><span>VIZAG</span><small>Service locations</small></div>
-          <div className="hero-scroll">Scroll to explore <span>↓</span></div>
-        </section>
-
-        <section className="ticker" aria-label="Service locations" data-testid="location-ticker"><div>PRE-DELIVERY INSPECTION <b>✦</b> DELIVERY FILMS <b>✦</b> AUTOMOTIVE STORIES <b>✦</b> HYDERABAD · VIJAYAWADA · VIZAG <b>✦</b></div></section>
-
-        <section className="intro section-pad" id="services" data-testid="services-section">
-          <div className="section-label"><span>01</span><span>What I do</span></div>
-          <div className="intro-copy"><h2>The car you choose<br />deserves a <em>closer look.</em></h2><p>Buying a car is a big feeling. I help you protect that feeling — with a thorough pre-delivery inspection, and capture the handover as a memory worth keeping.</p></div>
-          <div className="service-grid">
-            <article className="service-card pdi-card" data-testid="pdi-service-card"><div className="service-image" style={{ backgroundImage: `url(${images.pdi})` }} /><div className="service-number">01 / 02</div><div className="service-content"><span className="eyebrow">For new car buyers</span><h3>Pre-delivery<br /><em>inspection.</em></h3><p>A careful look before you sign, so you can take delivery with clarity.</p><div className="service-foot"><span>Hyderabad · Vijayawada · Vizag</span><button className="circle-arrow" onClick={() => setModalOpen(true)} aria-label="Enquire about PDI" data-testid="pdi-enquiry-button"><ArrowUpRight size={19} /></button></div></div></article>
-            <article className="service-card shoot-card" data-testid="delivery-service-card"><div className="service-image" style={{ backgroundImage: `url(${images.delivery})` }} /><div className="service-number">02 / 02</div><div className="service-content"><span className="eyebrow">For the big handover</span><h3>Delivery day,<br /><em>your way.</em></h3><p>Car delivery shoots, reels and edits that make the moment feel like yours.</p><div className="service-foot"><span>Film · Reels · Edit</span><button className="circle-arrow" onClick={() => setModalOpen(true)} aria-label="Enquire about delivery shoots" data-testid="delivery-enquiry-button"><ArrowUpRight size={19} /></button></div></div></article>
-          </div>
-        </section>
-
-        <section className="work-section section-pad" id="work" data-testid="work-section"><div className="section-label"><span>02</span><span>Selected work</span></div><div className="work-heading"><h2>Cars, captured<br /><em>with feeling.</em></h2><div className="work-links"><a href={instagramUrl} target="_blank" rel="noreferrer" data-testid="instagram-profile-link"><Instagram size={17} /> Instagram <ArrowUpRight size={14} /></a><a href={youtubeUrl} target="_blank" rel="noreferrer" data-testid="youtube-profile-link"><Youtube size={17} /> YouTube <ArrowUpRight size={14} /></a></div></div><div className="portfolio-grid"><a className="portfolio-item tall" href={instagramUrl} target="_blank" rel="noreferrer" style={{ backgroundImage: `url(${images.delivery})` }} data-testid="portfolio-delivery-link"><div className="portfolio-overlay"><span>Delivery shoots</span><ArrowUpRight size={18} /></div></a><a className="portfolio-item wide" href={youtubeUrl} target="_blank" rel="noreferrer" style={{ backgroundImage: `url(${images.camera})` }} data-testid="portfolio-video-link"><div className="portfolio-overlay"><span>Reviews · News · Tips</span><span className="play-icon"><Play size={13} fill="currentColor" /></span></div></a><a className="portfolio-item square" href={instagramUrl} target="_blank" rel="noreferrer" style={{ backgroundImage: `url(${images.hero})` }} data-testid="portfolio-reels-link"><div className="portfolio-overlay"><span>Reels & edits</span><ArrowUpRight size={18} /></div></a></div></section>
-
-        <section className="about-section" id="about" data-testid="about-section"><div className="about-photo" style={{ backgroundImage: `url(${images.camera})` }} /><div className="about-copy"><div className="section-label"><span>03</span><span>Behind the wheel</span></div><h2>Not just about<br />the <em>spec sheet.</em></h2><p>Mr. Gearhead in Telugu is an automotive content creator focused on the details that matter — the ones you notice when you’re about to make a big decision, and the moments you want to remember after.</p><p className="muted-copy">Reviews, news, tips and car culture — in a language that feels like home.</p><a className="text-link" href={instagramUrl} target="_blank" rel="noreferrer" data-testid="about-instagram-link">Follow along on Instagram <ArrowUpRight size={16} /></a></div></section>
-
-        <section className="final-cta" data-testid="final-cta-section"><div className="cta-mark">MG</div><div><span className="eyebrow">Ready when you are</span><h2>Make your next<br /><em>car moment count.</em></h2></div><button className="button button-red" onClick={() => setModalOpen(true)} data-testid="final-booking-button">Start an enquiry <ArrowUpRight size={17} /></button></section>
-      </main>
-
-      <footer className="footer" data-testid="site-footer"><div className="footer-brand"><span className="mark">MG</span><span>MR. GEARHEAD<br /><b>IN TELUGU</b></span></div><p>Automotive stories, inspections<br />and delivery day memories.</p><div className="footer-socials"><a href={instagramUrl} target="_blank" rel="noreferrer" aria-label="Instagram" data-testid="footer-instagram-link"><Instagram size={18} /></a><a href={youtubeUrl} target="_blank" rel="noreferrer" aria-label="YouTube" data-testid="footer-youtube-link"><Youtube size={18} /></a></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Mr. Gearhead in Telugu</span><span>Private concept · Pending creator approval</span></div></footer>
-      {modalOpen && <BookingModal onClose={() => setModalOpen(false)} />}
-    </div>
-  );
+  const [bookingService, setBookingService] = useState(null);
+  useEffect(() => { const onHash = () => setPath(window.location.hash.replace("#/", "") || "home"); window.addEventListener("hashchange", onHash); return () => window.removeEventListener("hashchange", onHash); }, []);
+  useEffect(() => { document.title = `${pages[path]?.title || "Mr. Gearhead in Telugu"} — Mr. Gearhead in Telugu`; window.scrollTo(0, 0); }, [path]);
+  const onBook = (service = "PDI") => { setBookingService(service); navigate("contact"); setMenuOpen(false); };
+  const nav = [["home", "Home"], ["pdi", "PDI Services"], ["content", "Delivery & Reels"], ["portfolio", "Portfolio"], ["pricing", "Pricing"], ["contact", "Contact"]];
+  const page = path === "pdi" ? <PdiPage onBook={onBook} /> : path === "content" ? <ContentPage onBook={onBook} /> : path === "portfolio" ? <PortfolioPage /> : path === "pricing" ? <PricingPage onBook={onBook} /> : path === "contact" ? <ContactPage initialService={bookingService || "PDI"} /> : <Home onBook={onBook} />;
+  return <div className="site-shell"><header className="topbar"><button className="wordmark" onClick={() => navigate("home")}><span className="mark">MG</span><span>MR. GEARHEAD<br /><b>IN TELUGU</b></span></button><nav className={`main-nav ${menuOpen ? "open" : ""}`}>{nav.map(([key, label]) => <button key={key} className={path === key ? "active" : ""} onClick={() => { navigate(key); setMenuOpen(false); }}>{label}</button>)}<Button className="nav-cta" onClick={() => onBook("PDI")}>Book an enquiry <ArrowUpRight size={15} /></Button></nav><button className="mobile-menu" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle navigation">{menuOpen ? <X /> : <Menu />}</button></header>{page}<footer className="footer"><div className="footer-brand"><span className="mark">MG</span><span>MR. GEARHEAD<br /><b>IN TELUGU</b></span></div><p>Automotive stories, inspections<br />and delivery day memories.</p><div className="footer-socials"><a href={instagramUrl} target="_blank" rel="noreferrer" aria-label="Instagram"><Instagram size={18} /></a><a href={youtubeUrl} target="_blank" rel="noreferrer" aria-label="YouTube"><Youtube size={18} /></a></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Mr. Gearhead in Telugu</span><span>Draft concept · Pending creator approval</span></div></footer></div>;
 }
 
 export default App;
