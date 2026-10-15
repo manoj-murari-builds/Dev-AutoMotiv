@@ -4,15 +4,15 @@ import {
   Instagram, MapPin, Menu, MessageCircle, Play, Send, X, Youtube,
 } from "lucide-react";
 import "./styles/App.css";
-import { contact, images, instagramUrl, locations, pricing, youtubeUrl } from "./config";
+import { contact, images, instagramUrl, locations, pricing, seo, youtubeUrl } from "./config";
 
 const pages = {
-  home: { title: "Home" },
-  pdi: { title: "PDI Services" },
-  content: { title: "Delivery Shoots & Reels" },
-  portfolio: { title: "Portfolio" },
-  pricing: { title: "Pricing" },
-  contact: { title: "Contact & Booking" },
+  home: { title: seo.defaultTitle, description: seo.defaultDescription },
+  pdi: { title: "PDI Services in Hyderabad, Vijayawada & Vizag | Mr. Gearhead", description: "Learn about pre-delivery inspection categories, process, pricing and booking options for new car buyers." },
+  content: { title: "Car Delivery Shoots, Reels & Editing | Mr. Gearhead", description: "Car delivery photography, cinematic videos, Instagram reels, editing and automotive content collaborations." },
+  portfolio: { title: "Automotive Portfolio | Mr. Gearhead in Telugu", description: "Explore automotive delivery stories, reviews, news, tips and reels from Mr. Gearhead in Telugu." },
+  pricing: { title: "PDI & Car Content Pricing | Mr. Gearhead", description: "View draft pricing for PDI inspections, delivery shoots, reels, editing and the PDI plus delivery-shoot combo." },
+  contact: { title: "Contact & Booking | Mr. Gearhead in Telugu", description: "Send a booking enquiry for a PDI, delivery shoot, reels or editing service in Hyderabad, Vijayawada or Vizag." },
 };
 
 const pdiAreas = [
@@ -154,7 +154,33 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [bookingService, setBookingService] = useState(null);
   useEffect(() => { const onPopState = () => setPath(currentPath()); window.addEventListener("popstate", onPopState); return () => window.removeEventListener("popstate", onPopState); }, []);
-  useEffect(() => { document.title = `${pages[path]?.title || "Mr. Gearhead in Telugu"} — Mr. Gearhead in Telugu`; window.scrollTo(0, 0); }, [path]);
+  useEffect(() => {
+    const page = pages[path] || pages.home;
+    const canonicalUrl = `${window.location.origin}${window.location.pathname}`;
+    document.title = page.title;
+    const setMeta = (selector, attribute, value) => {
+      let element = document.head.querySelector(selector);
+      if (!element) { element = document.createElement("meta"); element.setAttribute(attribute, selector.match(/"([^"]+)"/)[1]); document.head.appendChild(element); }
+      element.content = value;
+    };
+    setMeta('meta[name="description"]', "name", page.description);
+    setMeta('meta[property="og:title"]', "property", page.title);
+    setMeta('meta[property="og:description"]', "property", page.description);
+    setMeta('meta[property="og:type"]', "property", "website");
+    setMeta('meta[property="og:url"]', "property", canonicalUrl);
+    setMeta('meta[property="og:image"]', "property", seo.image);
+    setMeta('meta[name="twitter:card"]', "name", "summary_large_image");
+    setMeta('meta[name="twitter:title"]', "name", page.title);
+    setMeta('meta[name="twitter:description"]', "name", page.description);
+    setMeta('meta[name="twitter:image"]', "name", seo.image);
+    let canonical = document.head.querySelector('link[rel="canonical"]');
+    if (!canonical) { canonical = document.createElement("link"); canonical.rel = "canonical"; document.head.appendChild(canonical); }
+    canonical.href = canonicalUrl;
+    let structuredData = document.head.querySelector("#site-structured-data");
+    if (!structuredData) { structuredData = document.createElement("script"); structuredData.id = "site-structured-data"; structuredData.type = "application/ld+json"; document.head.appendChild(structuredData); }
+    structuredData.textContent = JSON.stringify({ "@context": "https://schema.org", "@type": "ProfessionalService", name: seo.siteName, description: seo.defaultDescription, areaServed: locations, sameAs: [instagramUrl, youtubeUrl], url: window.location.origin });
+    window.scrollTo(0, 0);
+  }, [path]);
   const onBook = (service = "PDI") => { setBookingService(service); navigate("contact"); setMenuOpen(false); };
   const nav = [["home", "Home"], ["pdi", "PDI Services"], ["content", "Delivery & Reels"], ["portfolio", "Portfolio"], ["pricing", "Pricing"], ["contact", "Contact"]];
   const page = path === "pdi" ? <PdiPage onBook={onBook} /> : path === "content" ? <ContentPage onBook={onBook} /> : path === "portfolio" ? <PortfolioPage /> : path === "pricing" ? <PricingPage onBook={onBook} /> : path === "contact" ? <ContactPage initialService={bookingService || "PDI"} /> : <Home onBook={onBook} />;

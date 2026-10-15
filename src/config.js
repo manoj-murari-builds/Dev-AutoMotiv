@@ -15,6 +15,13 @@ export const pricing = {
 
 export const locations = ["Hyderabad", "Vijayawada", "Vizag"];
 
+export const seo = {
+  siteName: "Mr. Gearhead in Telugu",
+  defaultTitle: "Mr. Gearhead in Telugu | PDI & Car Delivery Films",
+  defaultDescription: "Pre-delivery inspections, car delivery shoots, reels and automotive stories in Telugu across Hyderabad, Vijayawada and Vizag.",
+  image: "https://images.unsplash.com/photo-1661050629760-9c927d20ea79?auto=format&fit=crop&w=1200&q=80",
+};
+
 export const images = {
   hero: "https://images.unsplash.com/photo-1661050629760-9c927d20ea79?auto=format&fit=crop&w=1800&q=85",
   pdi: "https://images.unsplash.com/photo-1643701079732-3b1c7a797e3d?auto=format&fit=crop&w=1200&q=85",
