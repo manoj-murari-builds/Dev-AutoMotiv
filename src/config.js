@@ -3,6 +3,7 @@ export const business = {
   publicName: "Saha Dev",
   phone: "+91 9063337181",
   whatsappNumber: "919063337181",
+  displayWhatsApp: "+91 9063337181",
   location: "Hyderabad, Telangana",
   instagramUrl: "https://www.instagram.com/dev_automotiv/",
 };

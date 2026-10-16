@@ -76,7 +76,7 @@ function BookingForm({ initialService = services.newCar, compact = false }) {
     if (form.phone && !/^[0-9+\s()-]{8,}$/.test(form.phone)) nextErrors.phone = "Enter a valid phone number.";
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length) return;
-    const nextMessage = `Hi Dev, I’m ${form.name}. I’d like to enquire about a ${form.service} for my ${form.car} in ${form.city} on ${form.date}.${form.requirements ? ` Additional requirements: ${form.requirements}` : ""} My phone number is ${form.phone}.`;
+    const nextMessage = `Hi Saha Dev, I’m ${form.name}. I’d like to enquire about a ${form.service} for my ${form.car} in ${form.city} on ${form.date}.${form.requirements ? ` Additional requirements: ${form.requirements}` : ""} My phone number is ${form.phone}.`;
     setMessage(nextMessage);
     setCopied(false);
     window.open(`https://wa.me/${business.whatsappNumber}?text=${encodeURIComponent(nextMessage)}`, "_blank", "noopener,noreferrer");
@@ -147,7 +147,7 @@ function WorkPage() {
 }
 
 function ContactPage({ initialService }) {
-  return <main><section className="paper-section section-pad contact-layout contact-first"><BookingForm initialService={initialService} /><aside className="contact-aside"><span className="eyebrow">Direct contact</span><h2>Keep the<br /><em>conversation easy.</em></h2><p>Contact details are taken from the public Dev Automotiv Instagram bio. WhatsApp availability is not independently confirmed for this demo.</p><a className="text-link" href={`tel:${business.phone.replace(/\s/g, "")}`}><Phone size={16} /> Call {business.phone} <ArrowUpRight size={15} /></a><div className="contact-detail"><MapPin size={18} /><div><b>Service location</b><span>Hyderabad, Telangana</span></div></div><div className="contact-detail"><Instagram size={18} /><div><b>Instagram</b><a href={business.instagramUrl} target="_blank" rel="noreferrer"><span>@dev_automotiv</span></a></div></div></aside></section></main>;
+  return <main><section className="paper-section section-pad contact-layout contact-first"><BookingForm initialService={initialService} /><aside className="contact-aside"><span className="eyebrow">Direct contact</span><h2>Keep the<br /><em>conversation easy.</em></h2><p>Reach Saha Dev directly for availability, inspection details and booking confirmation.</p><a className="text-link" href={`tel:${business.phone.replace(/\s/g, "")}`}><Phone size={16} /> Call {business.phone} <ArrowUpRight size={15} /></a><div className="contact-detail"><MessageCircle size={18} /><div><b>WhatsApp</b><a href={`https://wa.me/${business.whatsappNumber}`} target="_blank" rel="noreferrer"><span>{business.displayWhatsApp}</span></a></div></div><div className="contact-detail"><MapPin size={18} /><div><b>Service location</b><span>Hyderabad, Telangana</span></div></div><div className="contact-detail"><Instagram size={18} /><div><b>Instagram</b><a href={business.instagramUrl} target="_blank" rel="noreferrer"><span>@dev_automotiv</span></a><span>instagram.com/dev_automotiv</span></div></div></aside></section></main>;
 }
 
 function App() {
