@@ -1,5 +1,5 @@
 {
-  "name": "mr-gearhead",
+  "name": "dev-automotiv",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -30,4 +30,3 @@
     "vite": "6.3.5"
   }
 }
-

@@ -1,30 +1,37 @@
-export const instagramUrl = "https://www.instagram.com/mr.gearheadintelugu/";
-export const youtubeUrl = "https://www.youtube.com/@Mr.Gearheadintelugu";
-
-export const contact = {
-  displayPhone: "+91 XXXXX XXXXX",
-  whatsappNumber: "91XXXXXXXXXX",
-  demoMode: true,
+export const business = {
+  name: "Dev Automotiv",
+  publicName: "Dev (Petrolhead)",
+  phone: "+91 9063337181",
+  whatsappNumber: "919063337181",
+  location: "Hyderabad, Telangana",
+  instagramUrl: "https://www.instagram.com/dev_automotiv/",
 };
 
-export const pricing = {
-  pdi: { label: "PDI inspection", price: "Starting at ₹1,999", service: "PDI" },
-  content: { label: "Delivery shoots, reels & editing", price: "Contact for pricing", service: "Delivery shoot" },
-  combo: { label: "PDI + delivery-shoot combo", price: "₹3,999", service: "Combo" },
+export const services = {
+  newCar: "New Car PDI",
+  usedCar: "Pre-Owned Car Inspection",
 };
 
-export const locations = ["Hyderabad", "Vijayawada", "Vizag"];
+export const demoPricing = {
+  startingFrom: "₹1,499",
+  label: "Demo starting price · pending confirmation",
+};
+
+export const locations = ["Hyderabad"];
 
 export const seo = {
-  siteName: "Mr. Gearhead in Telugu",
-  defaultTitle: "Mr. Gearhead in Telugu | PDI & Car Delivery Films",
-  defaultDescription: "Pre-delivery inspections, car delivery shoots, reels and automotive stories in Telugu across Hyderabad, Vijayawada and Vizag.",
-  image: "https://images.unsplash.com/photo-1661050629760-9c927d20ea79?auto=format&fit=crop&w=1200&q=80",
+  siteName: business.name,
+  defaultTitle: "Dev Automotiv | Car Inspection Services in Hyderabad",
+  defaultDescription:
+    "Certified PDI services, new car pre-delivery inspections and pre-owned car inspections in Hyderabad by Dev (Petrolhead).",
+  image:
+    "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=1200&q=85",
 };
 
 export const images = {
-  hero: "https://images.unsplash.com/photo-1661050629760-9c927d20ea79?auto=format&fit=crop&w=1800&q=85",
-  pdi: "https://images.unsplash.com/photo-1643701079732-3b1c7a797e3d?auto=format&fit=crop&w=1200&q=85",
-  delivery: "https://images.unsplash.com/photo-1587893143231-ebba3bedb2ea?auto=format&fit=crop&w=1200&q=85",
-  camera: "https://images.unsplash.com/photo-1595340298390-8113ab27284a?auto=format&fit=crop&w=1200&q=85",
+  hero: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=1800&q=85",
+  pdi: "https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=1200&q=85",
+  used: "https://commons.wikimedia.org/wiki/Special:FilePath/Maruti%20Suzuki%20Swift%20Dzire.jpg?width=1200",
+  detail: "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1200&q=85",
+  interior: "https://images.unsplash.com/photo-1504215680853-026ed2a45def?auto=format&fit=crop&w=1200&q=85",
 };
