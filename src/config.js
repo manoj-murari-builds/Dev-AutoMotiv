@@ -24,8 +24,7 @@ export const seo = {
   defaultTitle: "Dev Automotiv | Car Inspection Services in Hyderabad",
   defaultDescription:
     "Certified PDI services, new car pre-delivery inspections and pre-owned car inspections in Hyderabad by Saha Dev.",
-  image:
-    "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=1200&q=85",
+  image: "https://dev-automotiv.vercel.app/saha-dev.png",
 };
 
 export const images = {
