@@ -1,6 +1,6 @@
 export const business = {
   name: "Dev Automotiv",
-  publicName: "Dev (Petrolhead)",
+  publicName: "Saha Dev",
   phone: "+91 9063337181",
   whatsappNumber: "919063337181",
   location: "Hyderabad, Telangana",
@@ -23,7 +23,7 @@ export const seo = {
   siteName: business.name,
   defaultTitle: "Dev Automotiv | Car Inspection Services in Hyderabad",
   defaultDescription:
-    "Certified PDI services, new car pre-delivery inspections and pre-owned car inspections in Hyderabad by Dev (Petrolhead).",
+    "Certified PDI services, new car pre-delivery inspections and pre-owned car inspections in Hyderabad by Saha Dev.",
   image:
     "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=1200&q=85",
 };
