@@ -79,6 +79,7 @@ function BookingForm({ initialService = services.newCar, compact = false }) {
     const nextMessage = `Hi Dev, I’m ${form.name}. I’d like to enquire about a ${form.service} for my ${form.car} in ${form.city} on ${form.date}.${form.requirements ? ` Additional requirements: ${form.requirements}` : ""} My phone number is ${form.phone}.`;
     setMessage(nextMessage);
     setCopied(false);
+    window.open(`https://wa.me/${business.whatsappNumber}?text=${encodeURIComponent(nextMessage)}`, "_blank", "noopener,noreferrer");
   };
   const copyMessage = async () => {
     try {
@@ -99,7 +100,7 @@ function BookingForm({ initialService = services.newCar, compact = false }) {
       <div className="form-grid"><label className="form-field"><span>Inspection type *</span><select name="service" value={form.service} onChange={update}><option>{services.newCar}</option><option>{services.usedCar}</option></select>{errors.service && <small>{errors.service}</small>}</label>{field("car", "Car brand and model *", "text", "e.g. Hyundai Creta")}</div>
       <div className="form-grid"><label className="form-field"><span>Location within Hyderabad *</span><select name="city" value={form.city} onChange={update}>{locations.map((location) => <option key={location}>{location}</option>)}</select>{errors.city && <small>{errors.city}</small>}</label>{field("date", "Preferred inspection date *", "date")}</div>
       <label className="form-field"><span>Additional requirements</span><textarea name="requirements" value={form.requirements} onChange={update} placeholder="Anything useful to know?" rows="4" /></label>
-      <Button className="button-red" type="submit">Prepare WhatsApp enquiry <Send size={16} /></Button>
+      <Button className="button-red" type="submit">Open WhatsApp enquiry <Send size={16} /></Button>
     </form>
     {message && <div className="message-preview"><span className="eyebrow">Ready to send</span><p>{message}</p><div className="preview-actions"><Button className="button-red" onClick={openWhatsApp}><MessageCircle size={15} /> Open WhatsApp</Button><Button className="button-outline" onClick={copyMessage}><Copy size={15} /> {copied ? "Copied" : "Copy message"}</Button></div></div>}
   </div>;
